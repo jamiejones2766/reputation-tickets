@@ -45,7 +45,10 @@
   .ticket{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:center}
   .ticket:last-child{border-bottom:0}
   .ticket .div{font-weight:600;font-size:16px}
-  .ticket .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .ticket .sub{color:var(--muted);font-size:13px;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid}
+  .tag.photo{color:#9ad7ff;border-color:#9ad7ff}
+  .tag.charity{color:#ffb86b;border-color:#ffb86b}
   .ticket .price{font-size:20px;font-weight:700;text-align:right}
   .ticket .buy{grid-column:1 / -1}
   .ticket .buy .btn{width:100%}
@@ -189,7 +192,11 @@
       html+='<section class="event"><div class="event-h"><h3>'+esc(g.event)+'</h3><span class="d">'+esc(g.date)+'</span></div>';
       g.items.forEach(function(t){
         html+='<div class="ticket">';
-        html+='<div><div class="div">'+esc(t.division)+'</div><div class="sub">Ticket '+esc(t.ticket)+(t.extras?' · '+esc(t.extras):'')+'</div></div>';
+        var ex=t.extras||'', tags='';
+        if(/photo pack/i.test(ex)){ tags+='<span class="tag photo">Sportograf photos</span>'; ex=ex.replace(/Photo pack included\.?/i,''); }
+        if(/charity/i.test(ex)){ tags+='<span class="tag charity">Charity ticket</span>'; ex=ex.replace(/Charity ticket\.?/i,''); }
+        ex=ex.replace(/\s+/g,' ').trim();
+        html+='<div><div class="div">'+esc(t.division)+'</div><div class="sub"><span>Ticket '+esc(t.ticket)+(ex?' · '+esc(ex):'')+'</span>'+tags+'</div></div>';
         html+='<div class="price">'+esc(t.price)+'</div>';
         html+='<div class="buy">'+(t.held
           ? '<div class="held">Held for a buyer</div>'
