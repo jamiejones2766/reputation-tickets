@@ -170,6 +170,19 @@
 
   function divBase(d){ return String(d||"").replace(/\s*\(.*\)\s*$/,"").trim(); }
 
+  // Fixed display order for divisions. Anything unrecognised goes to the end.
+  var DIV_ORDER = [
+    [/women.*open/i], [/women.*doubl/i], [/women.*pro/i],
+    [/men.*open/i], [/men.*doubl/i], [/men.*pro/i],
+    [/mixed.*doubl/i],
+    [/women.*relay/i], [/men.*relay/i], [/mixed.*relay/i]
+  ];
+  function divRank(d){
+    var b=divBase(d);
+    for(var i=0;i<DIV_ORDER.length;i++){ if(DIV_ORDER[i][0].test(b)) return i; }
+    return DIV_ORDER.length;
+  }
+
   function render(){
     var list=document.getElementById('list'), meta=document.getElementById('meta');
     var rows=state.rows.filter(function(r){
@@ -187,6 +200,7 @@
       if(!byKey[k]){ byKey[k]={event:r.event,date:r.date,items:[]}; groups.push(byKey[k]); }
       byKey[k].items.push(r);
     });
+    groups.forEach(function(g){ g.items.sort(function(a,b){ return divRank(a.division)-divRank(b.division); }); });
     var html='';
     groups.forEach(function(g){
       html+='<section class="event"><div class="event-h"><h3>'+esc(g.event)+'</h3><span class="d">'+esc(g.date)+'</span></div>';
@@ -224,6 +238,7 @@
       if(events.indexOf(r.event)<0) events.push(r.event);
       var d=divBase(r.division); if(d && divs.indexOf(d)<0) divs.push(d);
     });
+    divs.sort(function(a,b){ return divRank(a)-divRank(b); });
     chips('eventChips', events, state.event, function(v){ state.event=v; buildFilters(); render(); });
     chips('divChips', divs, state.div, function(v){ state.div=v; buildFilters(); render(); });
     document.getElementById('divChips').style.display = divs.length>1 ? '' : 'none';
