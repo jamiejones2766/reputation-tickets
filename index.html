@@ -52,6 +52,13 @@
   .ticket .price{font-size:20px;font-weight:700;text-align:right}
   .ticket .buy{grid-column:1 / -1}
   .ticket .buy .btn{width:100%}
+  .offer{display:inline-block;margin-top:6px;color:#0f0f10;background:#ffd58a;border-radius:6px;padding:2px 8px;font-weight:700;font-size:13px}
+  .record{text-align:center;color:var(--muted);font-size:14px;margin:-6px 0 14px}
+  .record b{color:var(--text)}
+  .reviews{display:grid;gap:10px}
+  .review{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .review p{margin:0 0 6px;font-size:15px}
+  .review .who{color:var(--muted);font-size:13px}
   .held{color:var(--held);font-weight:600;font-size:14px;text-align:center;padding:10px;border:1px dashed var(--line);border-radius:10px}
   .empty{background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:26px 16px;text-align:center;color:var(--muted)}
   .steps{display:grid;gap:12px;grid-template-columns:1fr}
@@ -77,7 +84,7 @@
 
   <div class="promises">
     <div class="promise"><b>Face value or less</b><span>Nobody pays above the ticket price. Sellers can discount to shift it fast.</span></div>
-    <div class="promise"><b>£10 flat fee, from the seller</b><span>Buyers pay the ticket price and nothing on top.</span></div>
+    <div class="promise"><b>£10 flat fee, from the seller</b><span>Buyers pay the ticket price and nothing on top. <span class="offer">First 5 handovers: no fee.</span></span></div>
     <div class="promise"><b>Seller paid within 24 hours</b><span>Once the buyer confirms their new ticket email, by bank transfer.</span></div>
   </div>
 
@@ -86,6 +93,8 @@
     <a class="btn ghost" href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">Sell your ticket</a>
   </div>
 
+  <div class="record" id="record"></div>
+
   <h2 id="tickets">Available tickets</h2>
   <div class="filters">
     <div class="chips" id="eventChips"></div>
@@ -93,6 +102,11 @@
   </div>
   <div class="meta" id="meta">Loading tickets…</div>
   <div id="list"></div>
+
+  <div id="reviewsWrap" style="display:none">
+    <h2>What people say</h2>
+    <div class="reviews" id="reviews"></div>
+  </div>
 
   <h2>How it works</h2>
   <div class="steps">
@@ -111,7 +125,7 @@
         <li>Fill in the <a href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">seller form</a> with your ticket details, your personalisation link and two screenshots.</li>
         <li>We check it and list it. Your link is never shown publicly.</li>
         <li>When someone buys, we hold their payment while they complete the name change.</li>
-        <li>Once the buyer confirms, you're paid your price minus £10 within 24 hours, to a bank account in the original purchaser's name.</li>
+        <li>Once the buyer confirms, you're paid your price minus £10 within 24 hours, to a bank account in the original purchaser's name. While we're getting started, the first 5 handovers have no fee at all.</li>
       </ol>
       <p style="margin:12px 0 0"><a class="btn ghost small" href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">Open the seller form</a></p>
     </div>
@@ -252,8 +266,11 @@
       var rows=parseCSV(text);
       var head=rows.shift()||[];
       var idx={}; head.forEach(function(h,i){ idx[h.trim().toLowerCase()]=i; });
-      var out=[];
+      var out=[], reviews=[], completed=null;
       rows.forEach(function(r){
+        var c=(r[idx['completed']]||'').trim(); if(completed===null && /^\d+$/.test(c)) completed=parseInt(c,10);
+        var q=(r[idx['review quote']]||'').trim();
+        if(q) reviews.push({who:(r[idx['review name']]||'').trim(), ev:(r[idx['review event']]||'').trim(), quote:q});
         var ticket=(r[idx['ticket']]||'').trim();
         if(!/^\d+[A-Za-z]?$/.test(ticket)) return; // skips the "No tickets" message row and blanks
         out.push({
@@ -267,6 +284,17 @@
         });
       });
       state.rows=out; buildFilters(); render();
+      var rec=document.getElementById('record');
+      if(completed!==null && completed>0){
+        rec.innerHTML='<b>'+completed+'</b> ticket'+(completed==1?'':'s')+' handed over so far · payment held until the name change is confirmed';
+      } else {
+        rec.innerHTML='New service · every payment is held until the buyer confirms the name change';
+      }
+      var rw=document.getElementById('reviewsWrap'), rv=document.getElementById('reviews');
+      if(reviews.length){
+        rv.innerHTML=reviews.map(function(x){ return '<div class="review"><p>“'+esc(x.quote)+'”</p><div class="who">'+esc(x.who)+(x.ev?' · '+esc(x.ev):'')+'</div></div>'; }).join('');
+        rw.style.display='';
+      } else { rw.style.display='none'; }
     }).catch(function(e){
       document.getElementById('meta').innerHTML='<div class="err">Couldn\'t load the ticket list just now. Try again in a minute, or <a href="'+CSV_URL.replace('output=csv','')+'" target="_blank" rel="noopener">open it directly</a>.</div>';
       document.getElementById('list').innerHTML='';
