@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REPutation Hybrid Ticket Sales</title>
+<meta name="description" content="Buy or sell a HYROX ticket at face value or less. Payment held until the name change is done. Run by REPutation Hybrid Coaching.">
+<link rel="icon" href="logo.jpg">
+<style>
+  :root{
+    --bg:#0f0f10; --panel:#19191b; --panel2:#222225; --line:#2e2e32;
+    --text:#f3f3f1; --muted:#a6a6ad; --accent:#ffffff; --accent-text:#0f0f10;
+    --ok:#36c27a; --held:#e0a84b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+  a{color:inherit}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px 48px}
+  header{padding:20px 0 8px;text-align:center}
+  header img{width:min(340px,86%);border-radius:10px;display:block;margin:0 auto}
+  h1{font-size:clamp(26px,6.5vw,38px);line-height:1.1;letter-spacing:-0.02em;margin:18px 0 10px;text-align:center}
+  .lead{color:var(--muted);text-align:center;margin:0 auto 18px;max-width:560px;font-size:16px}
+  .promises{display:grid;gap:10px;grid-template-columns:1fr;margin:0 0 22px}
+  @media(min-width:560px){.promises{grid-template-columns:repeat(3,1fr)}}
+  .promise{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .promise b{display:block;font-size:15px;margin-bottom:4px}
+  .promise span{color:var(--muted);font-size:14px}
+  .cta-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 0 26px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 18px;border-radius:10px;font-weight:600;font-size:16px;text-decoration:none;border:2px solid var(--accent);cursor:pointer}
+  .btn.primary{background:var(--accent);color:var(--accent-text)}
+  .btn.ghost{background:transparent;color:var(--text)}
+  .btn.small{min-height:44px;padding:10px 14px;font-size:15px}
+  .btn.disabled{opacity:.55;pointer-events:none;border-color:var(--line);color:var(--muted);background:transparent}
+  h2{font-size:22px;letter-spacing:-0.01em;margin:30px 0 10px}
+  .filters{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 85%,transparent);padding:10px 0 8px;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;min-height:40px}
+  .chip.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+  .meta{color:var(--muted);font-size:14px;margin:6px 0 12px}
+  .event{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:0 0 16px;overflow:hidden}
+  .event-h{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .event-h h3{margin:0;font-size:18px}
+  .event-h .d{color:var(--muted);font-size:14px;white-space:nowrap}
+  .ticket{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:center}
+  .ticket:last-child{border-bottom:0}
+  .ticket .div{font-weight:600;font-size:16px}
+  .ticket .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .ticket .price{font-size:20px;font-weight:700;text-align:right}
+  .ticket .buy{grid-column:1 / -1}
+  .ticket .buy .btn{width:100%}
+  .held{color:var(--held);font-weight:600;font-size:14px;text-align:center;padding:10px;border:1px dashed var(--line);border-radius:10px}
+  .empty{background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:26px 16px;text-align:center;color:var(--muted)}
+  .steps{display:grid;gap:12px;grid-template-columns:1fr}
+  @media(min-width:640px){.steps{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .card h3{margin:0 0 10px;font-size:17px}
+  .card ol{margin:0;padding-left:20px;color:var(--text)}
+  .card li{margin:0 0 8px;font-size:15px}
+  .rules{background:#1d1a14;border:1px solid #4a3c1e;border-radius:14px;padding:16px;color:#f0e2c2}
+  .rules h3{margin:0 0 8px;font-size:17px;color:#ffd58a}
+  .rules p{margin:0 0 8px;font-size:15px}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:30px;line-height:1.6}
+  .err{background:#2a1b1b;border:1px solid #5a2b2b;color:#ffd0d0;padding:12px 14px;border-radius:10px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="logo.jpg" alt="REPutation Hybrid Ticket Sales">
+    <h1>Buy or sell a HYROX ticket, safely.</h1>
+    <p class="lead">Every ticket changes hands at face value or less. We hold the buyer's money until the name change is done, then pay the seller within 24 hours.</p>
+  </header>
+
+  <div class="promises">
+    <div class="promise"><b>Face value or less</b><span>Nobody pays above the ticket price. Sellers can discount to shift it fast.</span></div>
+    <div class="promise"><b>£10 flat fee, from the seller</b><span>Buyers pay the ticket price and nothing on top.</span></div>
+    <div class="promise"><b>Seller paid within 24 hours</b><span>Once the buyer confirms their new ticket email, by bank transfer.</span></div>
+  </div>
+
+  <div class="cta-row">
+    <a class="btn primary" href="#tickets">See available tickets</a>
+    <a class="btn ghost" href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">Sell your ticket</a>
+  </div>
+
+  <h2 id="tickets">Available tickets</h2>
+  <div class="filters">
+    <div class="chips" id="eventChips"></div>
+    <div class="chips" id="divChips" style="margin-top:6px"></div>
+  </div>
+  <div class="meta" id="meta">Loading tickets…</div>
+  <div id="list"></div>
+
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="card">
+      <h3>If you're buying</h3>
+      <ol>
+        <li>Tap <b>I want this ticket</b> on the one you want. A short form opens with the ticket number already filled in.</li>
+        <li>We WhatsApp you a payment link for the listed price. The ticket is held for you for 2 hours (1 hour if the race is under 48 hours away).</li>
+        <li>Once paid, we send you the HYROX transfer link. You enter your own details on the HYROX page, so we never see your date of birth, address or emergency contact.</li>
+        <li>Confirm your new ticket email has arrived. We pay the seller.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>If you're selling</h3>
+      <ol>
+        <li>Fill in the <a href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">seller form</a> with your ticket details, your personalisation link and two screenshots.</li>
+        <li>We check it and list it. Your link is never shown publicly.</li>
+        <li>When someone buys, we hold their payment while they complete the name change.</li>
+        <li>Once the buyer confirms, you're paid your price minus £10 within 24 hours, to a bank account in the original purchaser's name.</li>
+      </ol>
+      <p style="margin:12px 0 0"><a class="btn ghost small" href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">Open the seller form</a></p>
+    </div>
+  </div>
+
+  <h2>Before you buy</h2>
+  <div class="rules">
+    <p>Only tickets with <b>Lite Flex</b> or <b>Flex</b> can have the name changed. Tickets with neither can't be transferred at all.</p>
+    <p>There is <b>one name change per ticket</b> and it can't be undone, so check your details before you submit them.</p>
+    <p>Name changes close at <b>7:59am event time the day before race day</b>. We stop listing tickets 12 hours before that.</p>
+    <p>The new athlete must be the <b>same gender and division</b> as the original.</p>
+    <p>If the transfer can't be completed, you get a <b>full refund</b>.</p>
+  </div>
+
+  <div class="cta-row" style="margin-top:26px">
+    <a class="btn primary" href="https://wa.me/447585464747" target="_blank" rel="noopener">WhatsApp us</a>
+    <a class="btn ghost" href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">Sell your ticket</a>
+  </div>
+
+  <footer>
+    Questions? WhatsApp 07585 464747.<br>
+    Run by REPutation Hybrid Coaching. Not affiliated with or endorsed by HYROX.
+  </footer>
+</div>
+
+<script>
+(function(){
+  // Data: the published "Listing" tab of the tracker (only that tab is public).
+  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSU277h109OzTvG2ccpZN2xrGoCNfd39LFDxqHVAcT7lsIGlrxoocIQQxKDQZv1Psae73NsEC6s4L3E/pub?gid=478795802&single=true&output=csv";
+  // Buyer form, pre-filled with the ticket number.
+  var BUY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdk7vP5mlNp49o_-zV_H74UuWgGI5eq5t8L0wERAFflQD29uw/viewform?usp=pp_url&entry.262965610=";
+
+  var state = { rows: [], event: "All", div: "All" };
+
+  function parseCSV(text){
+    var rows=[], row=[], field="", q=false;
+    for (var i=0;i<text.length;i++){
+      var c=text[i], n=text[i+1];
+      if(q){
+        if(c=='"' && n=='"'){ field+='"'; i++; }
+        else if(c=='"'){ q=false; }
+        else field+=c;
+      } else {
+        if(c=='"') q=true;
+        else if(c==','){ row.push(field); field=""; }
+        else if(c=='\n'){ row.push(field); rows.push(row); row=[]; field=""; }
+        else if(c=='\r'){ }
+        else field+=c;
+      }
+    }
+    if(field.length||row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+
+  function divBase(d){ return String(d||"").replace(/\s*\(.*\)\s*$/,"").trim(); }
+
+  function render(){
+    var list=document.getElementById('list'), meta=document.getElementById('meta');
+    var rows=state.rows.filter(function(r){
+      return (state.event==="All"||r.event===state.event) && (state.div==="All"||divBase(r.division)===state.div);
+    });
+    if(!rows.length){
+      list.innerHTML='<div class="empty">'+(state.rows.length?'No tickets match that filter.':'No tickets listed right now. Check back soon, or <a href="https://docs.google.com/forms/d/e/1FAIpQLScqQLzrN-NI_lZdO-7GiWsnZK0tNpTFDIpEi5GAHasVelMPkg/viewform" target="_blank" rel="noopener">list yours</a>.')+'</div>';
+      meta.textContent = state.rows.length ? '0 of '+state.rows.length+' tickets' : '';
+      return;
+    }
+    // group by event (keep sheet order: event, then date)
+    var groups=[], byKey={};
+    rows.forEach(function(r){
+      var k=r.event+'|'+r.date;
+      if(!byKey[k]){ byKey[k]={event:r.event,date:r.date,items:[]}; groups.push(byKey[k]); }
+      byKey[k].items.push(r);
+    });
+    var html='';
+    groups.forEach(function(g){
+      html+='<section class="event"><div class="event-h"><h3>'+esc(g.event)+'</h3><span class="d">'+esc(g.date)+'</span></div>';
+      g.items.forEach(function(t){
+        html+='<div class="ticket">';
+        html+='<div><div class="div">'+esc(t.division)+'</div><div class="sub">Ticket '+esc(t.ticket)+(t.extras?' · '+esc(t.extras):'')+'</div></div>';
+        html+='<div class="price">'+esc(t.price)+'</div>';
+        html+='<div class="buy">'+(t.held
+          ? '<div class="held">Held for a buyer</div>'
+          : '<a class="btn primary" href="'+BUY_URL+encodeURIComponent(t.ticket)+'" target="_blank" rel="noopener">I want this ticket →</a>')+'</div>';
+        html+='</div>';
+      });
+      html+='</section>';
+    });
+    list.innerHTML=html;
+    meta.textContent = rows.length+' ticket'+(rows.length==1?'':'s')+(state.rows.length!==rows.length?' of '+state.rows.length:'')+' · updates automatically';
+  }
+
+  function chips(id, values, current, onPick){
+    var el=document.getElementById(id); el.innerHTML='';
+    ['All'].concat(values).forEach(function(v){
+      var b=document.createElement('button'); b.className='chip'+(v===current?' on':''); b.textContent=v; b.type='button';
+      b.onclick=function(){ onPick(v); };
+      el.appendChild(b);
+    });
+  }
+
+  function buildFilters(){
+    var events=[], divs=[];
+    state.rows.forEach(function(r){
+      if(events.indexOf(r.event)<0) events.push(r.event);
+      var d=divBase(r.division); if(d && divs.indexOf(d)<0) divs.push(d);
+    });
+    chips('eventChips', events, state.event, function(v){ state.event=v; buildFilters(); render(); });
+    chips('divChips', divs, state.div, function(v){ state.div=v; buildFilters(); render(); });
+    document.getElementById('divChips').style.display = divs.length>1 ? '' : 'none';
+    document.getElementById('eventChips').style.display = events.length>1 ? '' : 'none';
+  }
+
+  function load(){
+    fetch(CSV_URL+'&cb='+Date.now(), {cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status); return r.text();
+    }).then(function(text){
+      var rows=parseCSV(text);
+      var head=rows.shift()||[];
+      var idx={}; head.forEach(function(h,i){ idx[h.trim().toLowerCase()]=i; });
+      var out=[];
+      rows.forEach(function(r){
+        var ticket=(r[idx['ticket']]||'').trim();
+        if(!/^\d+[A-Za-z]?$/.test(ticket)) return; // skips the "No tickets" message row and blanks
+        out.push({
+          ticket:ticket,
+          held:/held/i.test(r[idx['buy']]||''),
+          event:(r[idx['event']]||'').trim(),
+          date:(r[idx['race date']]||'').trim(),
+          division:(r[idx['division']]||'').trim(),
+          price:(r[idx['price']]||'').trim(),
+          extras:(r[idx['extras']]||'').trim()
+        });
+      });
+      state.rows=out; buildFilters(); render();
+    }).catch(function(e){
+      document.getElementById('meta').innerHTML='<div class="err">Couldn\'t load the ticket list just now. Try again in a minute, or <a href="'+CSV_URL.replace('output=csv','')+'" target="_blank" rel="noopener">open it directly</a>.</div>';
+      document.getElementById('list').innerHTML='';
+    });
+  }
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>
